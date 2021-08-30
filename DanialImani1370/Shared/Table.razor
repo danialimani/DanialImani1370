@@ -1,0 +1,1355 @@
+﻿@typeparam TItem
+@using System.ComponentModel
+@using System.Text.Json
+@using System.Globalization
+@using System.IO
+@using BlazorDownloadFile
+@using OfficeOpenXml
+@using OfficeOpenXml.Table
+@using System.Reflection.Metadata
+@using iTextSharp.text
+@using iTextSharp.text.pdf
+
+<style>
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    ::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+    * {
+        font-family: IRANSans !important;
+    }
+
+    a {
+        text-decoration: none;
+        color: #212529;
+    }
+
+        a:hover {
+            cursor: pointer;
+        }
+
+    .tbl-select-filter {
+        position: absolute;
+        z-index: 10;
+        top: 30px;
+        left: 0;
+        background-color: white;
+    }
+
+        .tbl-select-filter div {
+            padding: 3px 8px;
+            font-size: 15px;
+            font-weight: normal !important;
+        }
+
+            .tbl-select-filter div:hover {
+                background-color: #f1f1f1;
+            }
+
+    .txt-box-serach {
+        height: 25px;
+        font-size: 14px;
+    }
+
+    .filter-icon {
+        font-size: 19px;
+        margin: 0 7px;
+        position: relative;
+        top: -3px;
+    }
+
+    .th-detail {
+        margin-bottom: 30px;
+    }
+
+    .th-edit {
+        margin-bottom: 30px;
+    }
+
+    .th-delete {
+        margin-bottom: 30px;
+    }
+
+    .active {
+        background-color: #ccc;
+    }
+
+    .tbl-columns-show {
+        position: absolute;
+        z-index: 10;
+        bottom: 50px;
+        right: auto;
+        background-color: #f1f1f1;
+        width: 200px;
+        text-align: right;
+    }
+
+
+    table td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 100px;
+    }
+
+   
+
+    .tbl-container {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .serach-advance {
+        width: 200px;
+        height: 40px;
+    }
+
+    .tbl-head {
+        max-height: 90px;
+
+    }
+
+    .tbl-thead {
+        height: 70px;
+        z-index: 5;
+        position: sticky;
+        top: 0;
+        right: 0;
+        background-color: #f1f1f1;
+    }
+
+    .tbl-thead th{
+        min-width:150px;
+    }
+
+    .tbl-data {
+        height: calc(100% - 140px);
+        overflow: auto;
+    }
+
+    .tbl-tbody {
+        /*  top:70px;
+            position:relative;*/
+    }
+
+    .tbl-footer {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 50px;
+        background-color: lightgreen;
+        position: absolute;
+        z-index: 1;
+        bottom: 0;
+        right: 0;
+    }
+
+    .input-page {
+        width: 50px;
+        text-align: center;
+        border: none;
+        height: 20px;
+    }
+</style>
+<div class="tbl-container">
+    @if (Header != null)
+    {
+        <div class="tbl-head">
+            @Header
+        </div>
+
+    }
+
+    @if (IsActiveFullSerach)
+    {
+        <div class="serach-advance my-2">
+            <input class="form-control" type="text" @oninput="(ChangeEventArgs e)=>{FilterAdvance(e);}" placeholder="جستجو" />
+        </div>
+    }
+    <div class="tbl-data">
+        <table class="table table-striped">
+            <thead class="tbl-thead">
+                <tr>
+                    @if (IsNumberRowShow && CheckColumnName("ردیف", true))
+                    {
+                        <th>
+                            ردیف
+                            @if (IsActiveFilterColumn)
+                            {
+                                <input class="form-control txt-box-serach" style="visibility:hidden" type="text" />
+                            }
+                        </th>
+                    }
+                    @foreach (var th in DescriptionObject ?? Array.Empty<PropertyDescriptor>())
+                    {
+                        if (IsIdShow && CheckColumnName(th.Name, true))
+                        {
+                            <th>
+                                <div class="d-flex">
+                                    @if (ActiveName == th.DisplayName)
+                                    {
+                                        if (IsAssending.HasValue && IsAssending.Value == false)
+                                        {
+                                            <a class="" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                                <i class="bi bi-caret-up"></i>
+                                            </a>
+                                            <a class="" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
+                                                <i class="bi bi-caret-down-fill"></i>
+                                            </a>
+                                            <a class="" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                                @th.DisplayName
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a class="" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                                <i class="bi bi-caret-up-fill"></i>
+                                            </a>
+                                            <a class="" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
+                                                <i class="bi bi-caret-down"></i>
+                                            </a>
+                                            <a class="" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
+                                                @th.DisplayName
+                                            </a>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <a class="" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                            <i class="bi bi-caret-up"></i>
+                                        </a>
+                                        <a class="" @onclick="()=> {Sort(th.DisplayName,th.Name,false); }">
+                                            <i class="bi bi-caret-down"></i>
+                                        </a>
+                                        <a class="" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                            @th.DisplayName
+                                        </a>
+                                    }
+                                </div>
+                                @if (IsActiveFilterColumn)
+                                {
+                                    <div class="position-relative">
+                                        <div class="d-flex">
+                                            <input class="form-control txt-box-serach" @oninput="(ChangeEventArgs e)=>{Filter(e,th.Name);}" placeholder="@th.DisplayName" type="text" />
+                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);}"><i class="bi bi-filter-left"></i></a>
+                                        </div>
+                                        @if (FilterSelect.Where(c => c.Key == th.Name).FirstOrDefault().Value)
+                                        {
+                                            @if (FilterSelect.Where(c => c.Key == th.Name).FirstOrDefault().Value)
+                                            {
+                                                <div class="tbl-select-filter col">
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "0")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(0.ToString(),th.Name);}">
+                                                                شامل باشد با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(0.ToString(),th.Name);}">
+                                                                شامل باشد با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "1")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(1.ToString(),th.Name);}">
+                                                                شامل نباشد با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(1.ToString(),th.Name);}">
+                                                                شامل نباشد با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "2")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(2.ToString(),th.Name);}">
+                                                                شروع شود با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(2.ToString(),th.Name);}">
+                                                                شروع شود با
+                                                            </a>
+                                                        </div>
+                                                    }
+
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "3")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(3.ToString(),th.Name);}">
+                                                                تمام شود با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(3.ToString(),th.Name);}">
+                                                                تمام شود با
+                                                            </a>
+                                                        </div>
+                                                    }
+
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "4")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(4.ToString(),th.Name);}">
+                                                                بزرگتر از
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(4.ToString(),th.Name);}">
+                                                                بزرگتر از
+                                                            </a>
+                                                        </div>
+                                                    }
+
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "5")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(5.ToString(),th.Name);}">
+                                                                کوچکتر از
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(5.ToString(),th.Name);}">
+                                                                کوچکتر از
+                                                            </a>
+                                                        </div>
+                                                    }
+
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "6")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(6.ToString(),th.Name);}">
+                                                                بزرگتر مساوی با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(6.ToString(),th.Name);}">
+                                                                بزرگتر مساوی با
+                                                            </a>
+                                                        </div>
+                                                    }
+
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "7")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(7.ToString(),th.Name);}">
+                                                                کوچکتر مساوی با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(7.ToString(),th.Name);}">
+                                                                کوچکتر مساوی با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                }
+                            </th>
+                        }
+                        else
+                        {
+                            @if (th.Name != ColumnName && CheckColumnName(th.Name, true))
+                            {
+                                <th>
+                                    <div class="d-flex">
+                                        @if (ActiveName == th.DisplayName)
+                                        {
+                                            if (IsAssending.HasValue && IsAssending.Value == false)
+                                            {
+                                                <a class="" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                                    <i class="bi bi-caret-up"></i>
+                                                </a>
+                                                <a class="" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
+                                                    <i class="bi bi-caret-down-fill"></i>
+                                                </a>
+                                                <a class="" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                                    @th.DisplayName
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a class="" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                                    <i class="bi bi-caret-up-fill"></i>
+                                                </a>
+                                                <a class="" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
+                                                    <i class="bi bi-caret-down"></i>
+                                                </a>
+                                                <a class="" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
+                                                    @th.DisplayName
+                                                </a>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <a class="" @onclick="()=> {Sort(th.DisplayName,th.Name,true); }">
+                                                <i class="bi bi-caret-up"></i>
+                                            </a>
+                                            <a class="" @onclick="()=> {Sort(th.DisplayName,th.Name,false); }">
+                                                <i class="bi bi-caret-down"></i>
+                                            </a>
+                                            <a class="" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                                @th.DisplayName
+                                            </a>
+                                        }
+                                    </div>
+                                    @if (IsActiveFilterColumn)
+                                    {
+                                        <div class=position-relative>
+                                            <div class="d-flex">
+                                                <input class="form-control txt-box-serach" @oninput="(ChangeEventArgs e)=>{Filter(e,th.Name);}" placeholder="@th.DisplayName" type="text" />
+                                                <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);}" class="filter-icon"><i class="bi bi-filter-left"></i></a>
+                                            </div>
+                                            @if (FilterSelect.Where(c => c.Key == th.Name).FirstOrDefault().Value)
+                                            {
+                                                <div class="tbl-select-filter col">
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "0")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(0.ToString(),th.Name);}">
+                                                                شامل باشد با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(0.ToString(),th.Name);}">
+                                                                شامل باشد با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "1")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(1.ToString(),th.Name);}">
+                                                                شامل نباشد با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(1.ToString(),th.Name);}">
+                                                                شامل نباشد با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "2")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(2.ToString(),th.Name);}">
+                                                                شروع شود با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(2.ToString(),th.Name);}">
+                                                                شروع شود با
+                                                            </a>
+                                                        </div>
+                                                    }
+
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "3")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(3.ToString(),th.Name);}">
+                                                                تمام شود با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(3.ToString(),th.Name);}">
+                                                                تمام شود با
+                                                            </a>
+                                                        </div>
+                                                    }
+
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "4")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(4.ToString(),th.Name);}">
+                                                                بزرگتر از
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(4.ToString(),th.Name);}">
+                                                                بزرگتر از
+                                                            </a>
+                                                        </div>
+                                                    }
+
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "5")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(5.ToString(),th.Name);}">
+                                                                کوچکتر از
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(5.ToString(),th.Name);}">
+                                                                کوچکتر از
+                                                            </a>
+                                                        </div>
+                                                    }
+
+
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "6")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(6.ToString(),th.Name);}">
+                                                                بزرگتر مساوی با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(6.ToString(),th.Name);}">
+                                                                بزرگتر مساوی با
+                                                            </a>
+                                                        </div>
+                                                    }
+
+                                                    @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "7")
+                                                    {
+                                                        <div class="active">
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(7.ToString(),th.Name);}">
+                                                                کوچکتر مساوی با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <a @onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(7.ToString(),th.Name);}">
+                                                                کوچکتر مساوی با
+                                                            </a>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </th>
+                            }
+                        }
+                    }
+                    @if (OnDetail.HasDelegate && CheckColumnName("جزئیات", true))
+                    {
+                        <th class="th-detail">
+                            جزئیات
+                            @if (IsActiveFilterColumn)
+                            {
+                                <input class="form-control txt-box-serach" style="visibility:hidden" type="text" />
+                            }
+                        </th>
+                    }
+                    @if (OnEdit.HasDelegate && CheckColumnName("ویرایش", true))
+                    {
+                        <th class="th-edit">
+                            ویرایش
+                            @if (IsActiveFilterColumn)
+                            {
+                                <input class="form-control txt-box-serach" style="visibility:hidden" type="text" />
+                            }
+                        </th>
+                    }
+                    @if (OnDelete.HasDelegate && CheckColumnName("حذف", true))
+                    {
+                        <th class="th-detete">
+                            حذف
+                            @if (IsActiveFilterColumn)
+                            {
+                                <input class="form-control txt-box-serach" style="visibility:hidden" type="text" />
+                            }
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody class="tbl-tbody">
+                @{
+                    int RowCounter = 1;
+                    if (PageNumber > 1)
+                    {
+                        RowCounter = (PageNumber - 1) * RowCount + 1;
+                    }
+                }
+                @foreach (TItem row in Data ?? Array.Empty<TItem>())
+                {
+                    <tr>
+                        @if (IsNumberRowShow && CheckColumnName("ردیف", true))
+                        {
+                            <td>
+                                @RowCounter
+                            </td>
+                            RowCounter++;
+                        }
+                        @if (ItemTemplate == null)
+                        {
+                            @foreach (var column in row.GetType().GetProperties())
+                            {
+                                if (IsIdShow && CheckColumnName(column.Name, true))
+                                {
+                                    <td>
+                                        @column.GetValue(row)
+                                    </td>
+                                }
+                                else
+                                {
+                                    @if (column.Name != ColumnName && CheckColumnName(column.Name, true))
+                                    {
+                                        <td>
+                                            @column.GetValue(row)
+                                        </td>
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            @ItemTemplate(row)
+                        }
+                        @if (OnDetail.HasDelegate && CheckColumnName("جزئیات", true))
+                        {
+                            <td>
+                                <a @onclick="async()=>{await OnDetail.InvokeAsync(row.GetType().GetProperty(ColumnName).GetValue(row)); }">
+                                    <i class="bi bi-three-dots"></i>
+                                </a>
+                            </td>
+                        }
+                        @if (OnEdit.HasDelegate && CheckColumnName("ویرایش", true))
+                        {
+                            <td>
+                                <a @onclick="async()=>{await OnEdit.InvokeAsync(row.GetType().GetProperty(ColumnName).GetValue(row)); }">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                            </td>
+                        }
+                        @if (OnDelete.HasDelegate && CheckColumnName("حذف", true))
+                        {
+                            <td>
+                                <a @onclick="async()=>{await OnDelete.InvokeAsync(row.GetType().GetProperty(ColumnName).GetValue(row)); }">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="tbl-footer">
+        <div class="d-flex position-relative">
+            <div class="btn mx-2">
+                <a @onclick="Download">
+                    <i class="bi bi-file-earmark-excel-fill"></i>
+                    <span>
+                        خروجی اکسل
+                    </span>
+                </a>
+            </div>
+            <div class="position-relative btn mx-2">
+                <a class="mx-3" @onclick="()=>{IsVisibleColumn= !IsVisibleColumn;}">
+                    <i class="bi bi-columns"></i>
+                    ستون ها
+                </a>
+                @if (IsVisibleColumn)
+                {
+                    <div class="tbl-columns-show">
+                        @foreach (var column in Colunms)
+                        {
+                            @if (CustomColunms.Count > 0)
+                            {
+                                if (CustomColunms.ContainsKey(column.Key))
+                                {
+                                    <div class="p-2">
+                                        @if (column.Value)
+                                        {
+                                            <input @onclick="()=>{Change(column.Key,false);}" type="checkbox" class="px-2" checked />
+                                        }
+                                        else
+                                        {
+                                            <input @onclick="()=>{Change(column.Key,true);}" type="checkbox" class="px-2" />
+                                        }
+                                        @{
+                                            var displayColumnName = DescriptionObject.FirstOrDefault(c => c.Name == column.Key);
+                                            if (displayColumnName == null)
+                                            {
+                                                <span class="mx-2">
+                                                    @column.Key
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="mx-2">
+                                                    @displayColumnName.DisplayName
+                                                </span>
+                                            }
+                                        }
+
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="p-2">
+                                    @if (column.Value)
+                                    {
+                                        <input @onclick="()=>{Change(column.Key,false);}" type="checkbox" class="px-2" checked />
+                                    }
+                                    else
+                                    {
+                                        <input @onclick="()=>{Change(column.Key,true);}" type="checkbox" class="px-2" />
+                                    }
+                                    @{
+                                        var displayColumnName = DescriptionObject.FirstOrDefault(c => c.Name == column.Key);
+                                        if (displayColumnName == null)
+                                        {
+                                            <span class="mx-2">
+                                                @column.Key
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="mx-2">
+                                                @displayColumnName.DisplayName
+                                            </span>
+                                        }
+                                    }
+
+                                </div>
+                            }
+                        }
+                    </div>
+
+                }
+
+            </div>
+        </div>
+        <div class="d-flex">
+            @if (IsActivePagination)
+            {
+                if (PageNumber == 1)
+                {
+                    <a>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                }
+                else
+                {
+                    <a @onclick="Previous">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                }
+                <input type="number" class="input-page" value=@PageNumber @oninput="(ChangeEventArgs e)=>{
+                            try{
+                                    if(int.Parse(e.Value.ToString())<=PageCount)
+                                    {
+                                        GoToPageNumber(int.Parse(e.Value.ToString()));
+                                    }
+                            }
+                            catch{
+
+                            }
+                            }" />
+                @if (PageNumber == PageCount)
+                {
+
+                    <a>
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                }
+                else
+                {
+                    <a @onclick="Next">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                }
+                <div>
+                    صفحه @PageNumber از @PageCount
+                </div>
+                @*   <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                    @if (PageNumber == 1)
+                    {
+                    <li class="page-item"><a class="page-link  aria-disabled=" true"">Previous</a></li>
+                    }
+                    else
+                    {
+
+                    <li class="page-item"><a @onclick="Previous" class="page-link ">Previous</a></li>
+                    }
+                    @for (int i = 1; i <= PageCount; i++)
+                    {
+                    @if (PageNumber == i)
+                    {
+                    <li class="page-item active"><a class="page-link">@i</a></li>
+                    }
+                    else
+                    {
+                    int pagenumber = i;
+                    <li class="page-item"><a @onclick="()=>{GoToPageNumber(pagenumber);}" class="page-link">@i</a></li>
+
+                    }
+                    }
+                    @if (PageNumber == PageCount)
+                    {
+                    <li class="page-item"><a class="page-link" aria-disabled="true">Next</a></li>
+                    }
+                    else
+                    {
+                    <li class="page-item"><a @onclick="Next" class="page-link">Next</a></li>
+                    }
+                    </ul>
+                    </nav>*@
+            }
+        </div>
+    </div>
+
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<TItem> Data { get; set; }
+    [Parameter]
+    public bool IsIdShow { get; set; }
+    [Parameter]
+    public bool IsNumberRowShow { get; set; }
+    [Parameter]
+    public int RowCount { get; set; } = 10;
+    [Parameter]
+    public bool IsActivePagination { get; set; }
+    [Parameter]
+    public bool IsActiveFilterColumn { get; set; }
+    [Parameter]
+    public RenderFragment<TItem> ItemTemplate { get; set; }
+    [Parameter]
+    public EventCallback<object> OnDetail { get; set; }
+    [Parameter]
+    public EventCallback<object> OnEdit { get; set; }
+    [Parameter]
+    public EventCallback<object> OnDelete { get; set; }
+    [Parameter]
+    public RenderFragment AdvanceSearch { get; set; }
+    [Parameter]
+    public RenderFragment Header { get; set; }
+    [Parameter]
+    public bool IsActiveFullSerach { get; set; }
+    [Parameter]
+    public bool IsMiladi { get; set; }
+    public bool IsVisibleColumn { get; set; }
+    public IEnumerable<TItem> Items { get; set; }
+    public IEnumerable<TItem> FilterData { get; set; }
+    public int PageNumber { get; set; } = 1;
+    public string ColumnName { get; set; } = "Id";
+    public bool? IsAssending { get; set; }
+    public string ActiveName { get; set; }
+    public string PropertyName { get; set; }
+    public int PageCount { get; set; }
+    public Dictionary<string, string> FilterTypes { get; set; } = new();
+    public Dictionary<string, string> SearchColumnValues { get; set; } = new();
+    public Dictionary<string, bool> Colunms { get; set; } = new();
+    public Dictionary<string, string> CustomColunms { get; set; } = new();
+    public Dictionary<string, bool> FilterSelect { get; set; } = new();
+    public IEnumerable<PropertyDescriptor> DescriptionObject { get; set; }
+    [Inject]
+    public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
+    [Inject]
+    public IJSRuntime IJSRuntime { get; set; }
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            DescriptionObject = TypeDescriptor.GetProperties(typeof(TItem))
+                      .Cast<PropertyDescriptor>().ToList();
+
+            @if (IsNumberRowShow)
+            {
+
+                Colunms.Add("ردیف", true);
+                CustomColunms.Add("ردیف", "ردیف");
+            }
+    foreach (var th in DescriptionObject)
+            {
+                if (th.Name == ColumnName)
+                {
+                    if (IsIdShow)
+                    {
+                        Colunms.Add(th.Name, true);
+                        FilterSelect.Add(th.Name, false);
+                    }
+                }
+                else
+                {
+                    Colunms.Add(th.Name, true);
+                }
+            }
+            Colunms.Add("ویرایش", true);
+            Colunms.Add("حذف", true);
+            Colunms.Add("جزئیات", true);
+            CustomColunms.Add("ویرایش", "ویرایش");
+            CustomColunms.Add("حذف", "حذف");
+            CustomColunms.Add("جزئیات", "جزئیات");
+            if (IsIdShow)
+            {
+                CustomColunms.Add("Id", "Id");
+
+            }
+            StateHasChanged();
+        }
+    }
+    protected override void OnParametersSet()
+    {
+        if (Data != default)
+        {
+            Items = JsonSerializer.Deserialize<IEnumerable<TItem>>(JsonSerializer.Serialize(Data));
+            if (IsActivePagination)
+            {
+                PageCount = Data.Count() % RowCount == 0 ? Data.Count() / RowCount : (int)(Data.Count() / RowCount) + 1;
+
+                Data = Items.Skip((PageNumber - 1) * RowCount).Take(RowCount).ToList();
+            }
+            else
+            {
+                Data = Items;
+            }
+            StateHasChanged();
+        }
+
+    }
+    public void Sort(string activeName, string name, bool isAssending)
+    {
+        ActiveName = activeName;
+        PropertyName = name;
+        IsAssending = isAssending;
+        OrderBy(name, isAssending);
+        StateHasChanged();
+    }
+    public void OrderBy(string name, bool isAssending)
+    {
+        if (isAssending)
+        {
+            Items = Items.OrderBy(c => c.GetType().GetProperties().FirstOrDefault(p => p.Name == name).GetValue(c)).ToList();
+            FilterData = FilterData?.OrderBy(c => c.GetType().GetProperties().FirstOrDefault(p => p.Name == name).GetValue(c)).ToList();
+            Data = Data?.OrderBy(c => c.GetType().GetProperties().FirstOrDefault(p => p.Name == name).GetValue(c)).ToList();
+        }
+        else
+        {
+            Items = Items.OrderByDescending(c => c.GetType().GetProperties().FirstOrDefault(p => p.Name == name).GetValue(c)).ToList();
+            FilterData = FilterData?.OrderByDescending(c => c.GetType().GetProperties().FirstOrDefault(p => p.Name == name).GetValue(c)).ToList();
+            Data = Data?.OrderByDescending(c => c.GetType().GetProperties().FirstOrDefault(p => p.Name == name).GetValue(c)).ToList();
+        }
+        if (IsActivePagination)
+        {
+            GoToPageNumber(PageNumber);
+        }
+    }
+    public void GoToPageNumber(int pageNumber)
+    {
+        PageNumber = pageNumber;
+
+        if (FilterData == null)
+        {
+            Data = Items.Skip((PageNumber - 1) * RowCount).Take(RowCount).ToList();
+        }
+        else
+        {
+            Data = FilterData.Skip((PageNumber - 1) * RowCount).Take(RowCount).ToList();
+        }
+
+
+        StateHasChanged();
+    }
+    public void Next()
+    {
+        PageNumber++;
+        GoToPageNumber(PageNumber);
+    }
+    public void Previous()
+    {
+        PageNumber--;
+        GoToPageNumber(PageNumber);
+    }
+    public void Filter(ChangeEventArgs e, string name)
+    {
+
+        if (SearchColumnValues.ContainsKey(name))
+        {
+            SearchColumnValues[name] = e.Value.ToString();
+        }
+        else
+        {
+            SearchColumnValues.Add(name, e.Value.ToString());
+        }
+        List<TItem> curenData = Items.ToList();
+        foreach (var serachValue in SearchColumnValues)
+        {
+            if (string.IsNullOrEmpty(serachValue.Value) == false)
+            {
+                string k = serachValue.Key.ToString();
+                string v = serachValue.Value.ToString();
+                string filterType = "0";
+                if (FilterTypes.ContainsKey(k))
+                {
+                    filterType = FilterTypes[k];
+                }
+
+                if (filterType == "0")
+                {
+                    curenData = curenData.Where(c => c.GetType().GetProperty(k).GetValue(c).ToString().Contains(v)).ToList();
+                }
+                else if (filterType == "1")
+                {
+                    curenData = curenData.Where(c => c.GetType().GetProperty(k).GetValue(c).ToString().Contains(v) == false).ToList();
+                }
+                else if (filterType == "2")
+                {
+                    curenData = curenData.Where(c => c.GetType().GetProperty(k).GetValue(c).ToString().StartsWith(v)).ToList();
+                }
+                else if (filterType == "3")
+                {
+                    curenData = curenData.Where(c => c.GetType().GetProperty(k).GetValue(c).ToString().EndsWith(v)).ToList();
+                }
+                else if (filterType == "4")
+                {
+                    int currentValue = 0;
+                    try
+                    {
+                        currentValue = int.Parse(v);
+                        curenData = curenData.Where(c => int.Parse(c.GetType().GetProperty(k).GetValue(c).ToString()) > currentValue).ToList();
+                    }
+                    catch
+                    {
+                        DateTime date;
+                        try
+                        {
+                            date = ToMiladi(v);
+                            curenData = curenData.Where(c => ToMiladi(c.GetType().GetProperty(k).GetValue(c).ToString()) > date).ToList();
+
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                }
+                else if (filterType == "5")
+                {
+                    int currentValue = 0;
+                    try
+                    {
+                        currentValue = int.Parse(v);
+                        curenData = curenData.Where(c => int.Parse(c.GetType().GetProperty(k).GetValue(c).ToString()) < currentValue).ToList();
+                    }
+                    catch
+                    {
+                        DateTime date;
+                        try
+                        {
+                            date = ToMiladi(v);
+                            curenData = curenData.Where(c => ToMiladi(c.GetType().GetProperty(k).GetValue(c).ToString()) < date).ToList();
+
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                }
+                else if (filterType == "6")
+                {
+                    int currentValue = 0;
+                    try
+                    {
+                        currentValue = int.Parse(v);
+                        curenData = curenData.Where(c => int.Parse(c.GetType().GetProperty(k).GetValue(c).ToString()) >= currentValue).ToList();
+                    }
+                    catch
+                    {
+                        DateTime date;
+                        try
+                        {
+                            date = ToMiladi(v);
+                            curenData = curenData.Where(c => ToMiladi(c.GetType().GetProperty(k).GetValue(c).ToString()) >= date).ToList();
+
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                }
+                else if (filterType == "7")
+                {
+                    int currentValue = 0;
+                    try
+                    {
+                        currentValue = int.Parse(v);
+                        curenData = curenData.Where(c => int.Parse(c.GetType().GetProperty(k).GetValue(c).ToString()) <= currentValue).ToList();
+                    }
+                    catch
+                    {
+                        DateTime date;
+                        try
+                        {
+                            date = ToMiladi(v);
+                            curenData = curenData.Where(c => ToMiladi(c.GetType().GetProperty(k).GetValue(c).ToString()) <= date).ToList();
+
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                }
+
+            }
+        }
+
+        FilterData = curenData.ToList();
+        Data = curenData.ToList();
+
+
+        if (IsActivePagination)
+        {
+            PageNumber = 1;
+            PageCount = Data.Count() % RowCount == 0 ? Data.Count() / RowCount : (int)(Data.Count() / RowCount) + 1;
+            Data = Data.Skip((PageNumber - 1) * RowCount).Take(RowCount).ToList();
+        }
+        StateHasChanged();
+    }
+    public void FilterAdvance(ChangeEventArgs e)
+    {
+        if (e.Value.ToString() == "")
+        {
+            FilterData = Items;
+            Data = Items;
+        }
+        else
+        {
+            List<TItem> curentData = new();
+            foreach (var row in Items)
+            {
+                foreach (var property in row.GetType().GetProperties())
+                {
+                    if (property.GetValue(row) != null && property.GetValue(row).ToString().Contains(e.Value.ToString()))
+                    {
+                        if (curentData.FirstOrDefault(c => c.Equals(row)) == null)
+                        {
+                            curentData.Add(row);
+                        }
+                    }
+                }
+            }
+
+            FilterData = curentData;
+            Data = curentData;
+        }
+        if (IsActivePagination)
+        {
+            PageNumber = 1;
+            PageCount = Data.Count() % RowCount == 0 ? Data.Count() / RowCount : (int)(Data.Count() / RowCount) + 1;
+            Data = Data.Skip((PageNumber - 1) * RowCount).Take(RowCount).ToList();
+        }
+    }
+    public void ChangeFilter(string e, string name)
+    {
+        if (FilterTypes.ContainsKey(name))
+        {
+            FilterTypes[name] = e;
+        }
+        else
+        {
+            FilterTypes.Add(name, e);
+        }
+        ChangeEventArgs s = new ChangeEventArgs();
+        if (SearchColumnValues.ContainsKey(name))
+        {
+            s.Value = SearchColumnValues[name];
+            Filter(s, name);
+        }
+        else
+        {
+            s.Value = "";
+            Filter(s, name);
+        }
+    }
+    public DateTime ToMiladi(string pDate)
+    {
+        string[] date = pDate.Split('/', '-');
+        PersianCalendar pc = new PersianCalendar();
+        int day = int.Parse(date[2].ToString());
+        int month = int.Parse(date[1].ToString());
+        int year = int.Parse(date[0].ToString());
+        DateTime dt = new DateTime(year, month, day, pc);
+        return dt;
+    }
+    public bool CheckColumnName(string propertyName, bool current = false)
+    {
+        if (current == false)
+        {
+            if (CustomColunms.ContainsKey(propertyName) == false)
+            {
+                CustomColunms.Add(propertyName, propertyName);
+                StateHasChanged();
+            }
+        }
+
+
+        if (Colunms.ContainsKey(propertyName) && CustomColunms.ContainsKey(propertyName))
+        {
+            return Colunms[propertyName];
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public void Change(string name, bool value)
+    {
+        Colunms[name] = value;
+    }
+    public async Task<DowloadFileResult> Download()
+    {
+        var package = new ExcelPackage();
+        package.Workbook.Properties.Title = typeof(TItem).Name + "-Report";
+        package.Workbook.Properties.Author = "DanialImani1370";
+        package.Workbook.Properties.Subject = typeof(TItem).Name + "-Report";
+        package.Workbook.Properties.Keywords = "Testing";
+        var worksheet = package.Workbook.Worksheets.Add("RightToLeft");
+        worksheet.View.RightToLeft = true;
+        IEnumerable<TItem> items;
+        if (FilterData != null)
+        {
+            items = FilterData;
+        }
+        else
+        {
+            items = Items;
+        }
+        //First add the headers
+        int index = 0;
+        foreach (var th in DescriptionObject)
+        {
+            index++;
+
+            worksheet.Cells[1, index].Value = th.DisplayName;
+        }
+
+        int indexRow = 2;
+        foreach (var row in Items)
+        {
+            int indexColumn = 1;
+            foreach (var column in row.GetType().GetProperties())
+            {
+
+                worksheet.Cells[indexRow, indexColumn].Value = column.GetValue(row);
+                indexColumn++;
+            }
+            indexRow++;
+        }
+
+        byte[] reportBytes;
+        reportBytes = package.GetAsByteArray();
+        string name = typeof(TItem).Name + $"{DateTime.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}.xlsx";
+        var s = await BlazorDownloadFileService.DownloadFile(name, reportBytes, "application/octet-stream");
+        return s;
+    }
+
+    public void HideFillterSelect(string propName)
+    {
+        FilterSelect[propName] = false;
+    }
+    public void ShowFillterSelect(string propName)
+    {
+        FilterSelect[propName] = true;
+    }
+    public void ChangeVisibleFillterSelect(string propName)
+    {
+        if (FilterSelect.FirstOrDefault(c => c.Key == propName).Value == false)
+        {
+            ShowFillterSelect(propName);
+        }
+        else
+        {
+            HideFillterSelect(propName);
+        }
+        StateHasChanged();
+    }
+}

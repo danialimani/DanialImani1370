@@ -1,0 +1,315 @@
+﻿@page "/"
+@using System.Globalization
+
+    <Table @ref=Table Data=People IsIdShow=false IsNumberRowShow=true IsActivePagination=false IsActiveFilterColumn=true
+           OnDelete=Delete OnDetail=Detail OnEdit=Edit IsActiveFullSerach=true>
+        <Header>
+            <h1>پرسنل</h1>
+        </Header>
+        <ItemTemplate Context=person>
+            @if (Table.CheckColumnName(nameof(person.FirstName)))
+            {
+                <td>@person.FirstName</td>
+            }
+            @if (Table.CheckColumnName(nameof(person.LastName)))
+            {
+                <td>@person.LastName</td>
+            }
+            @if (Table.CheckColumnName(nameof(person.Age)))
+            {
+                <td>@person.Age سال</td>
+            }
+            @if (Table.CheckColumnName(nameof(person.Job)))
+            {
+                <td>@person.Job</td>
+            }
+            @if (Table.CheckColumnName(nameof(person.Sex)))
+            {
+                <td>@person.Sex</td>
+            }
+            @if (Table.CheckColumnName(nameof(person.Education)))
+            {
+                <td>@person.Education</td>
+            }
+            @if (Table.CheckColumnName(nameof(person.BrithDate)))
+            {
+                <td>@person.BrithDate</td>
+            }
+        </ItemTemplate>
+    </Table>
+
+
+@code {
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
+    public List<Person> People { get; set; } = new();
+    public Table<Person> Table { get; set; }
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            People.Add(new Person
+            {
+                Id = 1,
+                FirstName = "دانیال",
+                LastName = "ایمانی",
+                Age = 30,
+                Job = "مدیر توسعه نرم افزار",
+                Sex = "مرد",
+                Education = "پرفسور",
+                BrithDate = "1370-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "مقداد",
+                LastName = "مظفری",
+                Age = 35,
+                Job = "شبکه",
+                Sex = "مرد",
+                Education = "کارشناسی ارشد",
+                BrithDate = "1365-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 1,
+                FirstName = "حامد",
+                LastName = "خرم فر",
+                Age = 37,
+                Job = "مدیر فناوری اطلاعات",
+                Sex = "مرد",
+                Education = "کارشناسی ارشد",
+                BrithDate = "1363-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "احد",
+                LastName = "احمدیان",
+                Age = 27,
+                Job = "انبار دار",
+                Sex = "مرد",
+                Education = "کارشناسی",
+                BrithDate = "1373-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "ندا",
+                LastName = "گیفانی",
+                Age = 32,
+                Job = "حسابدار",
+                Sex = "زن",
+                Education = "کارشناسی",
+                BrithDate = "1368-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "نوید",
+                LastName = "الیاسی",
+                Age = 31,
+                Job = "مدیر روابط عمومی",
+                Sex = "مرد",
+                Education = "کارشناسی",
+                BrithDate = "1369-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "مهسا",
+                LastName = "قلوانی",
+                Age = 30,
+                Job = "مسئول شبکه های اجتماعی",
+                Sex = "زن",
+                Education = "کارشناسی",
+                BrithDate = "1370-10-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "هما",
+                LastName = "یاهو",
+                Age = 36,
+                Job = "سر دفتر",
+                Sex = "زن",
+                Education = "کارشناسی",
+                BrithDate = "1364-10-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "حسن",
+                LastName = "بوعلی",
+                Age = 40,
+                Job = "مدیر عامل",
+                Sex = "مرد",
+                Education = "کارشناسی",
+                BrithDate = "1360-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "حسین",
+                LastName = "بوعلی",
+                Age = 33,
+                Job = "مدیر عامل",
+                Sex = "مرد",
+                Education = "کارشناسی",
+                BrithDate = "1366-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "علی",
+                LastName = "بوعلی",
+                Age = 43,
+                Job = "مدیر عامل",
+                Sex = "مرد",
+                Education = "کارشناسی",
+                BrithDate = "1357-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 1,
+                FirstName = "دانیال",
+                LastName = "ایمانی",
+                Age = 30,
+                Job = "مدیر توسعه نرم افزار",
+                Sex = "مرد",
+                Education = "پرفسور",
+                BrithDate = "1370-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "مقداد",
+                LastName = "مظفری",
+                Age = 35,
+                Job = "شبکه",
+                Sex = "مرد",
+                Education = "کارشناسی ارشد",
+                BrithDate = "1365-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 1,
+                FirstName = "حامد",
+                LastName = "خرم فر",
+                Age = 37,
+                Job = "مدیر فناوری اطلاعات",
+                Sex = "مرد",
+                Education = "کارشناسی ارشد",
+                BrithDate = "1363-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "احد",
+                LastName = "احمدیان",
+                Age = 27,
+                Job = "انبار دار",
+                Sex = "مرد",
+                Education = "کارشناسی",
+                BrithDate = "1373-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "ندا",
+                LastName = "گیفانی",
+                Age = 32,
+                Job = "حسابدار",
+                Sex = "زن",
+                Education = "کارشناسی",
+                BrithDate = "1368-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "نوید",
+                LastName = "الیاسی",
+                Age = 31,
+                Job = "مدیر روابط عمومی",
+                Sex = "مرد",
+                Education = "کارشناسی",
+                BrithDate = "1369-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "مهسا",
+                LastName = "قلوانی",
+                Age = 30,
+                Job = "مسئول شبکه های اجتماعی",
+                Sex = "زن",
+                Education = "کارشناسی",
+                BrithDate = "1370-10-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "هما",
+                LastName = "یاهو",
+                Age = 36,
+                Job = "سر دفتر",
+                Sex = "زن",
+                Education = "کارشناسی",
+                BrithDate = "1364-10-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "حسن",
+                LastName = "بوعلی",
+                Age = 40,
+                Job = "مدیر عامل",
+                Sex = "مرد",
+                Education = "کارشناسی",
+                BrithDate = "1360-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "حسین",
+                LastName = "بوعلی",
+                Age = 33,
+                Job = "مدیر عامل",
+                Sex = "مرد",
+                Education = "کارشناسی",
+                BrithDate = "1366-05-21",
+            });
+            People.Add(new Person
+            {
+                Id = 2,
+                FirstName = "علی",
+                LastName = "بوعلی",
+                Age = 43,
+                Job = "مدیر عامل",
+                Sex = "مرد",
+                Education = "کارشناسی",
+                BrithDate = "1357-05-21",
+            });
+            StateHasChanged();
+        }
+    }
+    public async Task Detail(object value)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", value.ToString());
+    }
+    public async Task Edit(object value)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", value.ToString());
+    }
+    public async Task Delete(object value)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", value.ToString());
+    }
+    public string ToPersianDate(DateTime date)
+    {
+        string GregorianDate = date.ToLongDateString();
+        DateTime d = DateTime.Parse(GregorianDate);
+        PersianCalendar pc = new PersianCalendar();
+        return string.Format("{0}/{1}/{2}", pc.GetYear(d), pc.GetMonth(d), pc.GetDayOfMonth(d));
+    }
+}
