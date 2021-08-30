@@ -1,10 +1,12 @@
 ﻿@page "/"
 @using System.Globalization
 
-    <Table @ref=Table Data=People IsIdShow=false IsNumberRowShow=true IsActivePagination=false IsActiveFilterColumn=true
-           OnDelete=Delete OnDetail=Detail OnEdit=Edit IsActiveFullSerach=true>
+<div class="" style="width:90%;height:800px; margin:auto">
+
+    <Table  @ref=Table Options="new TableOption()" Data=People IsIdShow=false IsNumberRowShow=true IsActivePagination=false IsActiveFilterColumn=true
+           OnDelete=Delete OnDetail=Detail OnEdit=Edit IsActiveFullSerach=false>
         <Header>
-            <h1>پرسنل</h1>
+            <div class="py-4">کارمندان</div>
         </Header>
         <ItemTemplate Context=person>
             @if (Table.CheckColumnName(nameof(person.FirstName)))
@@ -37,6 +39,9 @@
             }
         </ItemTemplate>
     </Table>
+
+</div>
+
 
 
 @code {
