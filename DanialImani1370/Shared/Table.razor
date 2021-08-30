@@ -134,7 +134,9 @@
         max-height: 90px;
 
     }
-
+    .bi-caret-up-fill, .bi-caret-up, .bi-caret-down-fill, .bi-caret-down{
+        font-size:10px;
+    }
     .tbl-thead {
         height: 70px;
         z-index: 5;
@@ -173,7 +175,9 @@
         border: none;
         height: 20px;
     }
-
+    .fs-15{
+        font-size:15px;
+    }
 </style>
 <div class="@Options.TblContainer">
     @if (Header != null)
@@ -214,38 +218,38 @@
                                     {
                                         if (IsAssending.HasValue && IsAssending.Value == false)
                                         {
-                                            <a class="@Options.Atag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                            <a class="@Options.ThAtag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
                                                 <i class="bi bi-caret-up"></i>
                                             </a>
-                                            <a class="@Options.Atag" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
+                                            <a class="@Options.ThAtag" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
                                                 <i class="bi bi-caret-down-fill"></i>
                                             </a>
-                                            <a class="@Options.Atag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                            <a class="@Options.ThAtag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
                                                 @th.DisplayName
                                             </a>
                                         }
                                         else
                                         {
-                                            <a class="@Options.Atag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                            <a class="@Options.ThAtag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
                                                 <i class="bi bi-caret-up-fill"></i>
                                             </a>
-                                            <a class="@Options.Atag" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
+                                            <a class="@Options.ThAtag" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
                                                 <i class="bi bi-caret-down"></i>
                                             </a>
-                                            <a class="@Options.Atag" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
+                                            <a class="@Options.ThAtag" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
                                                 @th.DisplayName
                                             </a>
                                         }
                                     }
                                     else
                                     {
-                                        <a class="@Options.Atag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                        <a class="@Options.ThAtag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
                                             <i class="bi bi-caret-up"></i>
                                         </a>
-                                        <a class="@Options.Atag" @onclick="()=> {Sort(th.DisplayName,th.Name,false); }">
+                                        <a class="@Options.ThAtag" @onclick="()=> {Sort(th.DisplayName,th.Name,false); }">
                                             <i class="bi bi-caret-down"></i>
                                         </a>
-                                        <a class="@Options.Atag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                        <a class="@Options.ThAtag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
                                             @th.DisplayName
                                         </a>
                                     }
@@ -255,7 +259,7 @@
                                     <div class="position-relative">
                                         <div class="d-flex">
                                             <input class="@Options.InputSerach" @oninput="(ChangeEventArgs e)=>{Filter(e,th.Name);}" placeholder="@th.DisplayName" type="text" />
-                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);}"><i class="bi bi-filter-left"></i></a>
+                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);}"><i class="bi bi-filter-left"></i></a>
                                         </div>
                                         @if (FilterSelect.Where(c => c.Key == th.Name).FirstOrDefault().Value)
                                         {
@@ -265,7 +269,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "0")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(0.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(0.ToString(),th.Name);}">
                                                                 شامل باشد با
                                                             </a>
                                                         </div>
@@ -273,7 +277,7 @@
                                                     else
                                                     {
                                                         <div>
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(0.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(0.ToString(),th.Name);}">
                                                                 شامل باشد با
                                                             </a>
                                                         </div>
@@ -281,7 +285,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "1")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(1.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(1.ToString(),th.Name);}">
                                                                 شامل نباشد با
                                                             </a>
                                                         </div>
@@ -289,7 +293,7 @@
                                                     else
                                                     {
                                                         <div>
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(1.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(1.ToString(),th.Name);}">
                                                                 شامل نباشد با
                                                             </a>
                                                         </div>
@@ -297,7 +301,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "2")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(2.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(2.ToString(),th.Name);}">
                                                                 شروع شود با
                                                             </a>
                                                         </div>
@@ -305,7 +309,7 @@
                                                     else
                                                     {
                                                         <div>
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(2.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(2.ToString(),th.Name);}">
                                                                 شروع شود با
                                                             </a>
                                                         </div>
@@ -314,7 +318,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "3")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(3.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(3.ToString(),th.Name);}">
                                                                 تمام شود با
                                                             </a>
                                                         </div>
@@ -322,7 +326,7 @@
                                                     else
                                                     {
                                                         <div>
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(3.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(3.ToString(),th.Name);}">
                                                                 تمام شود با
                                                             </a>
                                                         </div>
@@ -331,7 +335,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "4")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(4.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(4.ToString(),th.Name);}">
                                                                 بزرگتر از
                                                             </a>
                                                         </div>
@@ -340,7 +344,7 @@
                                                     {
                                                         <div>
 
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(4.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(4.ToString(),th.Name);}">
                                                                 بزرگتر از
                                                             </a>
                                                         </div>
@@ -349,7 +353,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "5")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(5.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(5.ToString(),th.Name);}">
                                                                 کوچکتر از
                                                             </a>
                                                         </div>
@@ -357,7 +361,7 @@
                                                     else
                                                     {
                                                         <div>
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(5.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(5.ToString(),th.Name);}">
                                                                 کوچکتر از
                                                             </a>
                                                         </div>
@@ -366,7 +370,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "6")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(6.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(6.ToString(),th.Name);}">
                                                                 بزرگتر مساوی با
                                                             </a>
                                                         </div>
@@ -374,7 +378,7 @@
                                                     else
                                                     {
                                                         <div>
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(6.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(6.ToString(),th.Name);}">
                                                                 بزرگتر مساوی با
                                                             </a>
                                                         </div>
@@ -383,7 +387,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "7")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(7.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(7.ToString(),th.Name);}">
                                                                 کوچکتر مساوی با
                                                             </a>
                                                         </div>
@@ -391,7 +395,7 @@
                                                     else
                                                     {
                                                         <div>
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(7.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(7.ToString(),th.Name);}">
                                                                 کوچکتر مساوی با
                                                             </a>
                                                         </div>
@@ -413,38 +417,38 @@
                                         {
                                             if (IsAssending.HasValue && IsAssending.Value == false)
                                             {
-                                                <a class="@Options.Atag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                                <a class="@Options.ThAtag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
                                                     <i class="bi bi-caret-up"></i>
                                                 </a>
-                                                <a class="@Options.Atag" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
+                                                <a class="@Options.ThAtag" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
                                                     <i class="bi bi-caret-down-fill"></i>
                                                 </a>
-                                                <a class="@Options.Atag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                                <a class="@Options.ThAtag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
                                                     @th.DisplayName
                                                 </a>
                                             }
                                             else
                                             {
-                                                <a class="@Options.Atag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                                <a class="@Options.ThAtag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
                                                     <i class="bi bi-caret-up-fill"></i>
                                                 </a>
-                                                <a class="@Options.Atag" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
+                                                <a class="@Options.ThAtag" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
                                                     <i class="bi bi-caret-down"></i>
                                                 </a>
-                                                <a class="@Options.Atag" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
+                                                <a class="@Options.ThAtag" @onclick="()=> { Sort(th.DisplayName,th.Name,false); }">
                                                     @th.DisplayName
                                                 </a>
                                             }
                                         }
                                         else
                                         {
-                                            <a class="@Options.Atag" @onclick="()=> {Sort(th.DisplayName,th.Name,true); }">
+                                            <a class="@Options.ThAtag" @onclick="()=> {Sort(th.DisplayName,th.Name,true); }">
                                                 <i class="bi bi-caret-up"></i>
                                             </a>
-                                            <a class="@Options.Atag" @onclick="()=> {Sort(th.DisplayName,th.Name,false); }">
+                                            <a class="@Options.ThAtag" @onclick="()=> {Sort(th.DisplayName,th.Name,false); }">
                                                 <i class="bi bi-caret-down"></i>
                                             </a>
-                                            <a class="@Options.Atag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
+                                            <a class="@Options.ThAtag" @onclick="()=> { Sort(th.DisplayName,th.Name,true); }">
                                                 @th.DisplayName
                                             </a>
                                         }
@@ -454,7 +458,7 @@
                                         <div class=position-relative>
                                             <div class="d-flex">
                                                 <input class="@Options.InputSerach" @oninput="(ChangeEventArgs e)=>{Filter(e,th.Name);}" placeholder="@th.DisplayName" type="text" />
-                                                <a class="@Options.Atag filter-icon" @onclick="()=>{ChangeVisibleFillterSelect(th.Name);}" ><i class="bi bi-filter-left"></i></a>
+                                                <a class="@Options.ThAtag filter-icon" @onclick="()=>{ChangeVisibleFillterSelect(th.Name);}" ><i class="bi bi-filter-left"></i></a>
                                             </div>
                                             @if (FilterSelect.Where(c => c.Key == th.Name).FirstOrDefault().Value)
                                             {
@@ -462,7 +466,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "0")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(0.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(0.ToString(),th.Name);}">
                                                                 شامل باشد با
                                                             </a>
                                                         </div>
@@ -470,7 +474,7 @@
                                                     else
                                                     {
                                                         <div>
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(0.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(0.ToString(),th.Name);}">
                                                                 شامل باشد با
                                                             </a>
                                                         </div>
@@ -478,7 +482,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "1")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(1.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(1.ToString(),th.Name);}">
                                                                 شامل نباشد با
                                                             </a>
                                                         </div>
@@ -486,7 +490,7 @@
                                                     else
                                                     {
                                                         <div>
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(1.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(1.ToString(),th.Name);}">
                                                                 شامل نباشد با
                                                             </a>
                                                         </div>
@@ -494,7 +498,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "2")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(2.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(2.ToString(),th.Name);}">
                                                                 شروع شود با
                                                             </a>
                                                         </div>
@@ -502,7 +506,7 @@
                                                     else
                                                     {
                                                         <div>
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(2.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(2.ToString(),th.Name);}">
                                                                 شروع شود با
                                                             </a>
                                                         </div>
@@ -511,7 +515,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "3")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(3.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(3.ToString(),th.Name);}">
                                                                 تمام شود با
                                                             </a>
                                                         </div>
@@ -519,7 +523,7 @@
                                                     else
                                                     {
                                                         <div>
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(3.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(3.ToString(),th.Name);}">
                                                                 تمام شود با
                                                             </a>
                                                         </div>
@@ -528,7 +532,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "4")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(4.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(4.ToString(),th.Name);}">
                                                                 بزرگتر از
                                                             </a>
                                                         </div>
@@ -537,7 +541,7 @@
                                                     {
                                                         <div>
 
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(4.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(4.ToString(),th.Name);}">
                                                                 بزرگتر از
                                                             </a>
                                                         </div>
@@ -546,7 +550,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "5")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(5.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(5.ToString(),th.Name);}">
                                                                 کوچکتر از
                                                             </a>
                                                         </div>
@@ -554,7 +558,7 @@
                                                     else
                                                     {
                                                         <div>
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(5.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(5.ToString(),th.Name);}">
                                                                 کوچکتر از
                                                             </a>
                                                         </div>
@@ -564,7 +568,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "6")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(6.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(6.ToString(),th.Name);}">
                                                                 بزرگتر مساوی با
                                                             </a>
                                                         </div>
@@ -572,7 +576,7 @@
                                                     else
                                                     {
                                                         <div>
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(6.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(6.ToString(),th.Name);}">
                                                                 بزرگتر مساوی با
                                                             </a>
                                                         </div>
@@ -581,7 +585,7 @@
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "7")
                                                     {
                                                         <div class="active">
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(7.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(7.ToString(),th.Name);}">
                                                                 کوچکتر مساوی با
                                                             </a>
                                                         </div>
@@ -589,7 +593,7 @@
                                                     else
                                                     {
                                                         <div>
-                                                            <a class="@Options.Atag"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(7.ToString(),th.Name);}">
+                                                            <a class="text-dark"@onclick="()=>{ChangeVisibleFillterSelect(th.Name);ChangeFilter(7.ToString(),th.Name);}">
                                                                 کوچکتر مساوی با
                                                             </a>
                                                         </div>
@@ -710,7 +714,7 @@
     <div class="@Options.TblFooter">
         <div class="d-flex position-relative" style=" z-index: 1;bottom: 0;right: 0;">
             <div class="btn mx-2">
-                <a class="@Options.Atag" @onclick="Download">
+                <a class="@Options.ExcelLink" @onclick="Download">
                     <i class="bi bi-file-earmark-excel-fill"></i>
                     <span>
                         خروجی اکسل
@@ -718,7 +722,7 @@
                 </a>
             </div>
             <div class="position-relative btn mx-2">
-                <a class="@Options.Atag mx-3" @onclick="()=>{IsVisibleColumn= !IsVisibleColumn;}">
+                <a class="@Options.ColumnsLink" @onclick="()=>{IsVisibleColumn= !IsVisibleColumn;}">
                     <i class="bi bi-columns"></i>
                     ستون ها
                 </a>
