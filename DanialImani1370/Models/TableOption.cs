@@ -44,7 +44,7 @@ namespace DanialImani1370.Models
             ThEdit = "text-center text-white fs-15";
             TdDetail = "text-center ";
             TdDelete = "text-center ";
-            TdEdit = "text-center t";
+            TdEdit = "text-center ";
             TblFooter = "tbl-footer";
             ThAtag = "text-white fs-15";
             ExcelLink = "text-white";
