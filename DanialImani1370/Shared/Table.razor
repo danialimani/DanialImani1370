@@ -291,7 +291,7 @@
                                         </div>
                                         @if (FilterSelect.Where(c => c.Key == th.Name).FirstOrDefault().Value)
                                         {
-                                            <div class="tbl-select-filter col">
+                                            <div class="@Options.TblSelectFilter">
                                                 @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "0")
                                                 {
                                                     <div class="active-filter">
@@ -490,7 +490,7 @@
                                             </div>
                                             @if (FilterSelect.Where(c => c.Key == th.Name).FirstOrDefault().Value)
                                             {
-                                                <div class="tbl-select-filter col">
+                                                <div class="@Options.TblSelectFilter">
                                                     @if (FilterTypes.ContainsKey(th.Name) && FilterTypes[th.Name] == "0")
                                                     {
                                                         <div class="active-filter">
@@ -773,7 +773,7 @@
                 </a>
                 @if (IsVisibleColumn)
                 {
-                    <div class="tbl-columns-show" id="tbl-column">
+                    <div class="@Options.TblColumnsShow" id="tbl-column">
                         @foreach (var column in Colunms)
                         {
                             @if (CustomColunms.Count > 0)

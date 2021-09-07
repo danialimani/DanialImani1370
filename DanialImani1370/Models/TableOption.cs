@@ -29,6 +29,8 @@ namespace DanialImani1370.Models
         public string ThAtag { get; set; }
         public string ExcelLink { get; set; }
         public string ColumnsLink { get; set; }
+        public string TblSelectFilter { get; set; }
+        public string TblColumnsShow { get; set; }
         public TableOption()
         {
             TblContainer = "tbl-container";
@@ -50,6 +52,8 @@ namespace DanialImani1370.Models
             ExcelLink = "text-white ";
             ColumnsLink = "text-white ";
             Th = "text-white fs-14";
+            TblSelectFilter = "tbl-select-filter col";
+            TblColumnsShow = "tbl-columns-show";
         }
     }
 }
