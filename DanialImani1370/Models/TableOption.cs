@@ -39,17 +39,17 @@ namespace DanialImani1370.Models
             TblThead = "tbl-thead";
             TblTbody = "tbl-tbody";
             InputSerach = "form-control txt-box-serach";
-            ThDetail = "text-center text-white fs-15";
-            ThDelete = "text-center text-white fs-15";
-            ThEdit = "text-center text-white fs-15";
+            ThDetail = "text-center text-white fs-14";
+            ThDelete = "text-center text-white fs-14";
+            ThEdit = "text-center text-white fs-14";
             TdDetail = "text-center ";
             TdDelete = "text-center ";
             TdEdit = "text-center ";
             TblFooter = "tbl-footer";
-            ThAtag = "text-white fs-15";
-            ExcelLink = "text-white";
-            ColumnsLink = "text-white";
-            Th = "text-white fs-15";
+            ThAtag = "text-white fs-14";
+            ExcelLink = "text-white ";
+            ColumnsLink = "text-white ";
+            Th = "text-white fs-14";
         }
     }
 }

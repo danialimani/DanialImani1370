@@ -2,8 +2,7 @@
 @using System.Globalization
 
 <div class="" style="width:90%;height:800px; margin:auto">
-
-    <Table  @ref=Table Options="new TableOption()" Data=People IsIdShow=false IsNumberRowShow=true IsActivePagination=false IsActiveFilterColumn=true
+    <Table  @ref=Table Options="new TableOption()" Data=People IsIdShow=false IsNumberRowShow=true IsActivePagination=true IsActiveFilterColumn=true
            OnDelete=Delete OnDetail=Detail OnEdit=Edit IsActiveFullSerach=false>
         <Header>
             <div class="py-4">کارمندان</div>
