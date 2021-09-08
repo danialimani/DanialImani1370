@@ -97,11 +97,12 @@
 
     .active {
         color: #999;
-       
     }
+
     .active-filter {
         background-color: #f1f1f1;
     }
+
     .tbl-columns-show {
         position: absolute;
         z-index: 100;
@@ -815,36 +816,36 @@
                             }
                             else
                             {
-                    <div class="p-2">
-                        @if (column.Value)
-                        {
-                            <a @onclick="()=>{ Change(column.Key,false);}" class="px-2">
-                                <i class="bi bi-check-square"></i>
-                            </a>
-                        }
-                        else
-                        {
-                            <a @onclick="()=>{ Change(column.Key,true);}" class="px-2">
-                                <i class="bi bi-square"></i>
-                            </a>
-                        }
-                        @{
-                            var displayColumnName = DescriptionObject.FirstOrDefault(c => c.Name == column.Key);
-                            if (displayColumnName == null)
-                            {
-                                <span class="mx-2">
-                                    @column.Key
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="mx-2">
-                                    @displayColumnName.DisplayName
-                                </span>
-                            }
-                        }
+                                <div class="p-2">
+                                    @if (column.Value)
+                                    {
+                                        <a @onclick="()=>{ Change(column.Key,false);}" class="px-2">
+                                            <i class="bi bi-check-square"></i>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a @onclick="()=>{ Change(column.Key,true);}" class="px-2">
+                                            <i class="bi bi-square"></i>
+                                        </a>
+                                    }
+                                    @{
+                                        var displayColumnName = DescriptionObject.FirstOrDefault(c => c.Name == column.Key);
+                                        if (displayColumnName == null)
+                                        {
+                                            <span class="mx-2">
+                                                @column.Key
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="mx-2">
+                                                @displayColumnName.DisplayName
+                                            </span>
+                                        }
+                                    }
 
-                    </div>
+                                </div>
                             }
                         }
                     </div>
@@ -1349,16 +1350,32 @@
                 StateHasChanged();
             }
         }
-
-
-        if (Colunms.ContainsKey(propertyName) && CustomColunms.ContainsKey(propertyName))
+        if (ItemTemplate == null)
         {
-            return Colunms[propertyName];
+            if (Colunms.ContainsKey(propertyName))
+            {
+                return Colunms[propertyName];
+            }
+            else
+            {
+                return false;
+            }
         }
         else
         {
-            return false;
+
+            if (CustomColunms.ContainsKey(propertyName))
+            {
+                return Colunms[propertyName];
+            }
+            else
+            {
+                return false;
+            }
         }
+
+
+
     }
 
     public void Change(string name, bool value)
