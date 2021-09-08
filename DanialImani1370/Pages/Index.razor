@@ -16,7 +16,7 @@
         <Header>
             <div class="py-4">کارمندان</div>
         </Header>
-        @*<ItemTemplate Context=person>
+        <ItemTemplate Context=person>
             @if (Table.CheckColumnName(nameof(person.FirstName)))
             {
             <td>@person.FirstName</td>
@@ -33,7 +33,7 @@
             {
             <td>@person.Job</td>
             }
-            @if (Table.CheckColumnName(nameof(person.Sex)))
+            @*@if (Table.CheckColumnName(nameof(person.Sex)))
             {
             <td>@person.Sex</td>
             }
@@ -44,8 +44,8 @@
             @if (Table.CheckColumnName(nameof(person.BrithDate)))
             {
             <td>@person.BrithDate</td>
-            }
-        </ItemTemplate>*@
+            }*@
+        </ItemTemplate>
     </Table>
 
 </div>

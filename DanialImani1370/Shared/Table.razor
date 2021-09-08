@@ -143,7 +143,7 @@
 
     .tbl-thead {
         /*height: 65px;*/
-        z-index: 5;
+        z-index: 1;
         position: sticky;
         top: 0;
         right: 0;
@@ -222,7 +222,9 @@
                     {
                         <th class="@Options.Th @Options.RowNumber">
                             <div class="mb-2">
+                                <a class="@Options.ThAtag">
                                 ردیف
+                                </a>
                             </div>
                             @if (IsActiveFilterColumn)
                             {
@@ -728,24 +730,24 @@
                         }
                         @if (OnDetail != null && CheckColumnName("جزئیات", true))
                         {
-                            <td class="@Options.TdDetail">
-                                <a class="" @onclick="async()=>{await OnDetail(row.GetType().GetProperty(ColumnName).GetValue(row)); }">
+                            <td class="">
+                                <a class="@Options.TdDetail" @onclick="async()=>{await OnDetail(row.GetType().GetProperty(ColumnName).GetValue(row)); }">
                                     <i class="bi bi-three-dots"></i>
                                 </a>
                             </td>
                         }
                         @if (OnEdit != null && CheckColumnName("ویرایش", true))
                         {
-                            <td class="@Options.TdEdit">
-                                <a class="" @onclick="async()=>{await OnEdit(row.GetType().GetProperty(ColumnName).GetValue(row)); }">
+                            <td class="">
+                                <a class="@Options.TdEdit" @onclick="async()=>{await OnEdit(row.GetType().GetProperty(ColumnName).GetValue(row)); }">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
                             </td>
                         }
                         @if (OnDelete != null && CheckColumnName("حذف", true))
                         {
-                            <td class="@Options.TdDelete">
-                                <a class="" @onclick="async()=>{await OnDelete(row.GetType().GetProperty(ColumnName).GetValue(row)); }">
+                            <td class="">
+                                <a class="@Options.TdDelete" @onclick="async()=>{await OnDelete(row.GetType().GetProperty(ColumnName).GetValue(row)); }">
                                     <i class="bi bi-trash"></i>
                                 </a>
                             </td>
@@ -1027,11 +1029,16 @@
                     {
                         Colunms.Add(th.Name, true);
                         FilterSelect.Add(th.Name, false);
+                        CustomColunms.Add("Id", "Id");
                     }
                 }
                 else
                 {
                     Colunms.Add(th.Name, true);
+                    if (ItemTemplate == null)
+                    {
+                        CustomColunms.Add(th.Name, th.Name);
+                    }
                 }
             }
             Colunms.Add("ویرایش", true);
@@ -1040,11 +1047,6 @@
             CustomColunms.Add("ویرایش", "ویرایش");
             CustomColunms.Add("حذف", "حذف");
             CustomColunms.Add("جزئیات", "جزئیات");
-            if (IsIdShow)
-            {
-                CustomColunms.Add("Id", "Id");
-
-            }
             StateHasChanged();
         }
     }
@@ -1128,7 +1130,6 @@
     }
     public void Filter(ChangeEventArgs e, string name)
     {
-
         if (SearchColumnValues.ContainsKey(name))
         {
             SearchColumnValues[name] = e.Value.ToString();
@@ -1149,7 +1150,6 @@
                 {
                     filterType = FilterTypes[k];
                 }
-
                 if (filterType == "0")
                 {
                     curenData = curenData.Where(c => c.GetType().GetProperty(k).GetValue(c).ToString().Contains(v)).ToList();
@@ -1258,14 +1258,10 @@
                         }
                     }
                 }
-
             }
         }
-
         FilterData = curenData.ToList();
         Data = curenData.ToList();
-
-
         if (IsActivePagination)
         {
             PageNumber = 1;
@@ -1364,7 +1360,7 @@
         else
         {
 
-            if (CustomColunms.ContainsKey(propertyName))
+            if (CustomColunms.ContainsKey(propertyName)&& Colunms.ContainsKey(propertyName))
             {
                 return Colunms[propertyName];
             }
@@ -1406,9 +1402,11 @@
         int index = 0;
         foreach (var th in DescriptionObject)
         {
+            if (CustomColunms.ContainsKey(th.Name) && Colunms.ContainsKey(th.Name) && Colunms[th.Name])
+            {
             index++;
-
-            worksheet.Cells[1, index].Value = th.DisplayName;
+                worksheet.Cells[1, index].Value = th.DisplayName;
+            }
         }
 
         int indexRow = 2;
@@ -1417,9 +1415,11 @@
             int indexColumn = 1;
             foreach (var column in row.GetType().GetProperties())
             {
-
-                worksheet.Cells[indexRow, indexColumn].Value = column.GetValue(row);
-                indexColumn++;
+                if (CustomColunms.ContainsKey(column.Name) && Colunms.ContainsKey(column.Name) && Colunms[column.Name])
+                {
+                    worksheet.Cells[indexRow, indexColumn].Value = column.GetValue(row);
+                    indexColumn++;
+                }
             }
             indexRow++;
         }
